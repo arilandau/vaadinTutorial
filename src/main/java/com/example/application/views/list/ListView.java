@@ -3,6 +3,7 @@ package com.example.application.views.list;
 import java.util.Collections;
 
 import com.example.application.data.entity.Contact;
+import com.example.application.data.service.CrmService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -20,14 +21,17 @@ public class ListView extends VerticalLayout
 	TextField tfFilter = new TextField();
 	Grid<Contact> contactGrid;
 	ContactForm contactForm;
+	CrmService service;
 
-	public ListView()
+	public ListView(CrmService service)
 	{
+		this.service = service;
 		addClassName( "list-view" );
 		setSizeFull();
 		
 		add( createMenu() );
 		add( createContentLayout() );
+		updateList();
 	}
 
 	private HorizontalLayout createContentLayout()
@@ -59,7 +63,7 @@ public class ListView extends VerticalLayout
 
 	private Component createForm()
 	{
-		contactForm = new ContactForm( Collections.emptyList(), Collections.emptyList() );
+		contactForm = new ContactForm( service.findAllCompanies(), service.findAllStatuses() );
 		contactForm.setWidth( "25em" );
 		
 		return contactForm;
@@ -67,10 +71,11 @@ public class ListView extends VerticalLayout
 
 	private HorizontalLayout createMenu()
 	{
-		tfFilter.setPlaceholder( "Filter by name..." );
+		tfFilter.setPlaceholder( "Search by name or email ..." );
 		tfFilter.setClearButtonVisible( true );
 		tfFilter.setValueChangeMode( ValueChangeMode.LAZY );
-
+		tfFilter.addValueChangeListener( e -> updateList() );
+		
 		Button addContactButton = new Button( "Add contact" );
 
 		HorizontalLayout menuLayout = new HorizontalLayout();
@@ -79,5 +84,11 @@ public class ListView extends VerticalLayout
 		menuLayout.addClassName( "toolbar" );
 
 		return menuLayout;
-	}	
+	}
+
+	private void updateList()
+	{
+		contactGrid.setItems( service.findAllContacts( tfFilter.getValue() ) );
+	}
+
 }
