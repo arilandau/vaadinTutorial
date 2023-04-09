@@ -10,24 +10,24 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.ComboBox.ItemFilter;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.shared.Registration;
 
 import java.util.List;
 
 public class ContactForm extends FormLayout
 {
-	TextField firstName = new TextField( "First Name" );
-	TextField lastName = new TextField( "Last Name" );
-	EmailField email = new EmailField( "Email" );
-	ComboBox<Status> cmbStatus = new ComboBox<>( "Status" );
-	ComboBox<Company> cmbCompany = new ComboBox<>( "Company" );
+	TextField tfFirstName;
+	TextField tfLastName;
+	EmailField efEmail;
+	ComboBox<Company> cmbCompany;
+	ComboBox<Status> cmbStatus;
 	List<Status> allStatuses;
 	List<Company> allCompanies;
 
@@ -40,22 +40,85 @@ public class ContactForm extends FormLayout
 	public ContactForm( List<Company> companies, List<Status> statuses )
 	{
 		addClassName( "contact-form" );
-		binder.bindInstanceFields( this );
 
 		allCompanies = companies;
-		cmbCompany.setItems( companies );
+		allStatuses = statuses;
+
+		add( createFirstName() );
+		add( createLastName() );
+		add( createEmail() );
+		add( createCompany() );
+		add( createStatus() );
+		add( createBtnLayout() );
+	}
+
+	private TextField createFirstName()
+	{
+		tfFirstName = new TextField( "First Name" );
+		tfFirstName.setTitle( "First Name" );
+		tfFirstName.setRequired( true );
+
+		binder.forField( tfFirstName )
+				.asRequired( "Required" )
+				.bind( Contact::getFirstName, Contact::setFirstName );
+
+		return tfFirstName;
+	}
+
+	private TextField createLastName()
+	{
+		tfLastName = new TextField( "Last Name" );
+		tfLastName.setTitle( "Last Name" );
+		tfLastName.setRequired( true );
+
+		binder.forField( tfLastName )
+				.asRequired( "Required" )
+				.bind( Contact::getLastName, Contact::setLastName );
+
+		return tfLastName;
+	}
+
+	private EmailField createEmail()
+	{
+		efEmail = new EmailField( "Email" );
+		efEmail.setTitle( "Email" );
+		efEmail.setRequired( true );
+
+		binder.forField( efEmail )
+				.asRequired( "Required" )
+				.bind( Contact::getEmail, Contact::setEmail );
+
+		return efEmail;
+	}
+
+	private Component createCompany()
+	{
+		ItemFilter<Company> companyFilter = ( company, filterString ) -> company.getName().toLowerCase()
+				.startsWith( filterString.toLowerCase() );
+
+		cmbCompany = new ComboBox<>( "Company" );
+		cmbCompany.setItems( companyFilter, allCompanies );
 		cmbCompany.setItemLabelGenerator( Company::getName );
 
-		allStatuses = statuses;
-		cmbStatus.setItems( statuses );
+		binder.forField( cmbCompany )
+				.bind( Contact::getCompany, Contact::setCompany );
+
+		return cmbCompany;
+	}
+
+	private Component createStatus()
+	{
+		ItemFilter<Status> statusFilter = ( status, filterString ) -> status.getName().toLowerCase()
+				.startsWith( filterString.toLowerCase() );
+		
+		cmbStatus = new ComboBox<>( "Status" );
+		cmbStatus.setItems( statusFilter, allStatuses );
 		cmbStatus.setItemLabelGenerator( Status::getName );
 
-		add( firstName );
-		add( lastName );
-		add( email );
-		add( cmbCompany );
-		add( cmbStatus );
-		add( createBtnLayout() );
+		binder.forField( cmbStatus )
+				.bind( Contact::getStatus, Contact::setStatus );
+
+		return cmbStatus;
 	}
 
 	private HorizontalLayout createBtnLayout()
@@ -92,13 +155,13 @@ public class ContactForm extends FormLayout
 
 		for ( Status status : allStatuses )
 		{
-			if ( contact.getStatus().getName() == status.getName() )
+			if ( contact.getStatus() != null && contact.getStatus().getName() == status.getName() )
 				cmbStatus.setValue( contact.getStatus() );
 		}
-		
-		for ( Company company: allCompanies )
+
+		for ( Company company : allCompanies )
 		{
-			if ( contact.getCompany().getName() == company.getName())
+			if ( contact.getCompany() != null && contact.getCompany().getName() == company.getName() )
 				cmbCompany.setValue( contact.getCompany() );
 		}
 

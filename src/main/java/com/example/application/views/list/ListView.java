@@ -4,6 +4,8 @@ import java.util.Collections;
 
 import com.example.application.data.entity.Contact;
 import com.example.application.data.service.CrmService;
+import com.example.application.views.list.ContactForm.DeleteEvent;
+import com.example.application.views.list.ContactForm.SaveEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -92,6 +94,10 @@ public class ListView extends VerticalLayout
 		contactForm = new ContactForm( service.findAllCompanies(), service.findAllStatuses() );
 		contactForm.setWidth( "25em" );
 
+		contactForm.addSaveListener( this::saveContact );
+		contactForm.addDeleteListener( this::deleteContact );
+		contactForm.addCancelListener( e -> closeEditor() );
+
 		return contactForm;
 	}
 
@@ -123,4 +129,17 @@ public class ListView extends VerticalLayout
 		contactGrid.setItems( service.findAllContacts( tfFilter.getValue() ) );
 	}
 
+	private void saveContact( SaveEvent saveEvent )
+	{
+		service.saveContact( saveEvent.getContact() );
+		updateList();
+		closeEditor();
+	}
+
+	private void deleteContact( DeleteEvent deleteEvent )
+	{
+		service.deleteContact( deleteEvent.getContact() );
+		updateList();
+		closeEditor();
+	}
 }
