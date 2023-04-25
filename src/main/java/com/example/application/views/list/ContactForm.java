@@ -23,6 +23,8 @@ import java.util.List;
 
 public class ContactForm extends FormLayout
 {
+	private static final long serialVersionUID = 900328772897792528L;
+
 	TextField tfFirstName;
 	TextField tfLastName;
 	EmailField efEmail;
