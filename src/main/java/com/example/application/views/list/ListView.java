@@ -1,9 +1,8 @@
 package com.example.application.views.list;
 
-import java.util.Collections;
-
 import com.example.application.data.entity.Contact;
 import com.example.application.data.service.CrmService;
+import com.example.application.views.MainLayout;
 import com.example.application.views.list.ContactForm.DeleteEvent;
 import com.example.application.views.list.ContactForm.SaveEvent;
 import com.vaadin.flow.component.Component;
@@ -17,10 +16,12 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value = "")
-@PageTitle("Contacts | Vaadin CRM")
+@Route(value = "", layout = MainLayout.class)
+@PageTitle("Contacts")
 public class ListView extends VerticalLayout
 {
+	private static final long serialVersionUID = 980002741065203394L;
+
 	TextField tfFilter = new TextField();
 	Grid<Contact> contactGrid;
 	ContactForm contactForm;
