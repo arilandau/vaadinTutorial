@@ -43,8 +43,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver
 
 		LoginI18n.ErrorMessage i18nErrorMessage = i18n.getErrorMessage();
 		i18nErrorMessage.setTitle( "Error Logging In" );
-		i18nErrorMessage.setMessage(
-				"Please check your username and password." );
+		i18nErrorMessage.setMessage( "Please check your username and password." );
 		i18n.setErrorMessage( i18nErrorMessage );
 
 		loginForm.setI18n( i18n );
